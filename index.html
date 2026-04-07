@@ -120,6 +120,13 @@
   .modal-body strong { color: var(--accent); }
   .modal-hint { font-size: 11px; color: var(--text-dim); margin-bottom: 20px; }
   .modal-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+  /* Edit modal */
+  #edit-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.8); display: none; align-items: center; justify-content: center; z-index: 200; }
+  #edit-overlay.open { display: flex; }
+  #edit-modal { background: var(--surface); border: 1px solid var(--accent); padding: 24px 28px; max-width: 480px; width: 95%; }
+  #edit-error { font-size: 11px; color: var(--error); margin-bottom: 10px; min-height: 16px; }
+  .edit-btn { background: none; border: none; color: var(--text-ghost); cursor: pointer; font-size: 13px; padding: 0 0 0 6px; font-family: inherit; transition: color .2s; line-height: 1; }
+  .edit-btn:hover { color: var(--accent); }
 </style>
 </head>
 <body>
@@ -210,6 +217,36 @@
       <button class="btn primary" onclick="confirmImport(false)">Combinar</button>
       <button class="btn danger" onclick="confirmImport(true)">Reemplazar todo</button>
       <button class="btn" onclick="closeModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<div id="edit-overlay">
+  <div id="edit-modal">
+    <div class="modal-title">Editar Sesión</div>
+    <div class="grid-2" style="margin-bottom:12px">
+      <div class="field"><label>Colorista</label><input type="text" id="e-colorista"></div>
+      <div class="field"><label>Fecha</label><input type="date" id="e-fecha"></div>
+    </div>
+    <div class="grid-2-eq" style="margin-bottom:12px">
+      <div class="field"><label>Inicio sesión</label><input type="time" id="e-inicio" oninput="updateEditPreview()"></div>
+      <div class="field"><label>Fin sesión</label><input type="time" id="e-fin" oninput="updateEditPreview()"></div>
+    </div>
+    <div class="break-section" style="margin-bottom:12px">
+      <div class="break-header" id="e-break-header">
+        <span class="break-label">Corte de comida</span>
+        <label class="checkbox-label"><input type="checkbox" id="e-sin-corte" onchange="toggleEditBreak()"> Sin corte</label>
+      </div>
+      <div id="e-break-fields" class="grid-2-eq" style="margin-top:10px">
+        <div class="field"><label>Salida a comer</label><input type="time" id="e-c-salida" oninput="updateEditPreview()"></div>
+        <div class="field"><label>Regreso de comer</label><input type="time" id="e-c-regreso" oninput="updateEditPreview()"></div>
+      </div>
+    </div>
+    <div class="preview" id="edit-preview"></div>
+    <div id="edit-error"></div>
+    <div class="modal-btns">
+      <button class="btn primary" onclick="saveEdit()">Guardar cambios</button>
+      <button class="btn" onclick="closeEditModal()">Cancelar</button>
     </div>
   </div>
 </div>
@@ -424,7 +461,7 @@ function renderLog() {
       :`<span class="no-break">sin corte</span>`;
     return `<div class="session-row" id="row-${s.id}">
       <div>
-        <div class="session-name">${esc(s.colorista)}</div>
+        <div class="session-name">${esc(s.colorista)}<button class="edit-btn" onclick="openEdit(${s.id})" title="Editar">✎</button></div>
         <div class="session-sub">${s.fecha}<span class="dot">·</span>${s.inicio} → ${s.fin}</div>
       </div>
       <div class="session-break">${brkHtml}</div>
@@ -538,6 +575,94 @@ async function confirmImport(replace) {
 
 function closeModal(){document.getElementById('modal-overlay').classList.remove('open');}
 document.getElementById('modal-overlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
+
+// ── Edit ───────────────────────────────────────────────
+let editingId = null;
+
+function openEdit(id) {
+  const s = sessions.find(s=>s.id===id);
+  if(!s) return;
+  editingId = id;
+  document.getElementById('e-colorista').value = s.colorista;
+  document.getElementById('e-fecha').value = s.fecha;
+  document.getElementById('e-inicio').value = s.inicio;
+  document.getElementById('e-fin').value = s.fin;
+  const sinCorte = !s.cSalida && !s.cRegreso;
+  document.getElementById('e-sin-corte').checked = sinCorte;
+  document.getElementById('e-c-salida').value = s.cSalida || '14:00';
+  document.getElementById('e-c-regreso').value = s.cRegreso || '15:00';
+  document.getElementById('e-break-fields').style.display = sinCorte ? 'none' : 'grid';
+  document.getElementById('e-break-header').classList.toggle('has-fields', !sinCorte);
+  document.getElementById('edit-error').textContent = '';
+  updateEditPreview();
+  document.getElementById('edit-overlay').classList.add('open');
+  document.querySelectorAll('#edit-modal input').forEach(i=>i.style.colorScheme=isDark?'dark':'light');
+}
+
+function closeEditModal() {
+  document.getElementById('edit-overlay').classList.remove('open');
+  editingId = null;
+}
+
+function toggleEditBreak() {
+  const sinCorte = document.getElementById('e-sin-corte').checked;
+  document.getElementById('e-break-fields').style.display = sinCorte ? 'none' : 'grid';
+  document.getElementById('e-break-header').classList.toggle('has-fields', !sinCorte);
+  updateEditPreview();
+}
+
+function updateEditPreview() {
+  const ini=document.getElementById('e-inicio').value;
+  const fin=document.getElementById('e-fin').value;
+  const sinCorte=document.getElementById('e-sin-corte').checked;
+  const cs=document.getElementById('e-c-salida').value;
+  const cr=document.getElementById('e-c-regreso').value;
+  const el=document.getElementById('edit-preview');
+  if(!ini||!fin){el.innerHTML='';return;}
+  const raw=calcRaw(ini,fin);
+  if(raw<=0){el.innerHTML='';return;}
+  const brk=sinCorte?0:calcBreak(cs,cr);
+  const eff=raw-brk;
+  let html=`<span>bruto: <span class="val">${fmtDur(raw)}</span></span>`;
+  if(brk>0) html+=`<span>comida: <span class="val">${cs} → ${cr} (−${fmtDur(brk)})</span></span>`;
+  html+=`<span>efectivo: <span class="eff${eff<=0?' bad':''}">${eff>0?fmtDur(eff):'—'}</span></span>`;
+  el.innerHTML=html;
+}
+
+async function saveEdit() {
+  const errEl = document.getElementById('edit-error');
+  errEl.textContent = '';
+  const colorista = document.getElementById('e-colorista').value.trim();
+  const fecha = document.getElementById('e-fecha').value;
+  const ini = document.getElementById('e-inicio').value;
+  const fin = document.getElementById('e-fin').value;
+  const sinCorte = document.getElementById('e-sin-corte').checked;
+  const cs = sinCorte ? '' : document.getElementById('e-c-salida').value;
+  const cr = sinCorte ? '' : document.getElementById('e-c-regreso').value;
+
+  if(!colorista){errEl.textContent='⚠ Ingresa el nombre del colorista.';return;}
+  if(!fecha){errEl.textContent='⚠ Ingresa la fecha.';return;}
+  const raw=calcRaw(ini,fin);
+  if(raw<=0){errEl.textContent='⚠ La hora de fin debe ser mayor que la de inicio.';return;}
+  if(!sinCorte&&calcBreak(cs,cr)<=0){errEl.textContent='⚠ La hora de regreso debe ser mayor que la de salida.';return;}
+  const duration=calcEff(ini,fin,cs,cr);
+  if(duration<=0){errEl.textContent='⚠ El corte de comida es mayor que la sesión.';return;}
+
+  setSyncStatus('syncing','Guardando…');
+  const {error}=await db.from('sesiones').update({colorista,fecha,inicio:ini,fin,c_salida:cs||null,c_regreso:cr||null,duration}).eq('id',editingId);
+  if(error){setSyncStatus('err','Error al guardar');showToast('No se pudo guardar','err');return;}
+
+  const idx=sessions.findIndex(s=>s.id===editingId);
+  if(idx!==-1) sessions[idx]={...sessions[idx],colorista,fecha,inicio:ini,fin,cSalida:cs,cRegreso:cr,duration};
+
+  setSyncStatus('ok','Guardado ✓'); setTimeout(()=>setSyncStatus('',''),2000);
+  showToast('Sesión actualizada ✓');
+  closeEditModal();
+  renderLog();
+  if(currentView==='resumen') renderResumen();
+}
+
+document.getElementById('edit-overlay').addEventListener('click',function(e){if(e.target===this)closeEditModal();});
 
 // ── Init ───────────────────────────────────────────────
 document.getElementById('f-fecha').value=today();
