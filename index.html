@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contra el Huracán · Post</title>
+<style>
+  :root {
+    --bg: #0a0a0b;
+    --surface: #111113;
+    --border: #1e1e22;
+    --text: #e0d8cc;
+    --text-dim: #444;
+    --text-mid: #666;
+    --color: #f0a030;
+    --vfx: #20c080;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Courier New', monospace;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+  }
+
+  .eyebrow {
+    font-size: 10px;
+    letter-spacing: 5px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-size: clamp(28px, 6vw, 52px);
+    font-weight: bold;
+    letter-spacing: -1px;
+    color: var(--text);
+    text-align: center;
+    margin-bottom: 6px;
+    line-height: 1.1;
+  }
+
+  .subtitle {
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 64px;
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    width: 100%;
+    max-width: 620px;
+  }
+
+  .card {
+    display: block;
+    text-decoration: none;
+    border: 1px solid var(--border);
+    padding: 28px 28px 24px;
+    background: var(--surface);
+    transition: border-color .2s, background .2s, transform .15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--card-accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform .25s;
+  }
+  .card:hover { border-color: var(--card-accent); transform: translateY(-2px); }
+  .card:hover::before { transform: scaleX(1); }
+
+  .card-color { --card-accent: var(--color); }
+  .card-vfx   { --card-accent: var(--vfx); }
+
+  .card-icon {
+    font-size: 28px;
+    margin-bottom: 16px;
+    display: block;
+  }
+  .card-tag {
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--card-accent);
+    margin-bottom: 8px;
+  }
+  .card-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--text);
+    margin-bottom: 10px;
+    letter-spacing: -.3px;
+  }
+  .card-desc {
+    font-size: 11px;
+    color: var(--text-mid);
+    line-height: 1.6;
+    letter-spacing: .3px;
+  }
+  .card-arrow {
+    position: absolute;
+    bottom: 24px; right: 24px;
+    font-size: 16px;
+    color: var(--border);
+    transition: color .2s, transform .2s;
+  }
+  .card:hover .card-arrow {
+    color: var(--card-accent);
+    transform: translate(2px, -2px);
+  }
+
+  footer {
+    margin-top: 56px;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+  <div class="eyebrow">registro de salas · postproducción</div>
+  <h1>CONTRA EL HURACÁN</h1>
+  <div class="subtitle">DP Alex de Pablo &nbsp;·&nbsp; Color Fernando Medellín</div>
+
+  <div class="cards">
+    <a class="card card-color" href="sala_color_contra_el_huracan.html">
+      <span class="card-icon">🎨</span>
+      <div class="card-tag">Sala de Color</div>
+      <div class="card-title">Color Suite Log</div>
+      <div class="card-desc">Registro de sesiones de color. Horarios, cortes de comida y horas efectivas por colorista.</div>
+      <span class="card-arrow">↗</span>
+    </a>
+
+    <a class="card card-vfx" href="sala_vfx_contra_el_huracan.html">
+      <span class="card-icon">⚡</span>
+      <div class="card-tag">Sala VFX</div>
+      <div class="card-title">VFX Suite Log</div>
+      <div class="card-desc">Registro de sesiones de efectos visuales. Horarios, cortes de comida y horas efectivas.</div>
+      <span class="card-arrow">↗</span>
+    </a>
+  </div>
+
+  <footer>Contra el Huracán &nbsp;·&nbsp; 2025</footer>
+
+</body>
+</html>
