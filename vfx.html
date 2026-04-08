@@ -3,60 +3,164 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sala VFX · Contra el Huracán</title>
+<title>VFX Suite · Contra el Huracán</title>
+<link href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@300;800&family=PT+Mono&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
   :root {
-    --bg: #080c10; --surface: #0d1117; --surface-alt: #0a0e13; --surface-flash: #001a10;
-    --border: #1e2a36; --border-subtle: #161f28; --border-faint: #111820;
-    --text: #d0e8e0; --text-mid: #7aa898; --text-dim: #3d5a50; --text-faint: #243830; --text-ghost: #182820;
-    --accent: #20c080; --accent-text: #080c10; --strike: #2a4038;
-    --input-bg: #080c10; --error: #e05060; --ok-bg: #001a10; --ok-text: #20c080;
+    --bg:        #071618;
+    --surface:   #0D2226;
+    --surface-alt:#0a1a1e;
+    --surface-flash: #0d1a0a;
+    --border:    #1a3a40;
+    --border-subtle: #122830;
+    --border-faint:  #0e2228;
+    --text:      #E9F9FA;
+    --text-mid:  #97DDE4;
+    --text-dim:  #3a6870;
+    --text-faint:#1e4048;
+    --text-ghost:#122830;
+    --accent:    #E66221;
+    --accent-hi: #ff7a3a;
+    --accent-text: #ffffff;
+    --cyan:      #C0EBEF;
+    --strike:    #1e4048;
+    --input-bg:  #071618;
+    --error:     #e05060;
+    --ok-bg:     #071618;
+    --ok-text:   #C0EBEF;
   }
   .light {
-    --bg: #f0f7f4; --surface: #f8fdfb; --surface-alt: #e8f2ee; --surface-flash: #e0fff4;
-    --border: #b8d8cc; --border-subtle: #cce8dc; --border-faint: #ddf0e8;
-    --text: #102820; --text-mid: #3a6858; --text-dim: #7aaa98; --text-faint: #a8c8bc; --text-ghost: #c8e0d8;
-    --accent: #108860; --accent-text: #ffffff; --strike: #90b8a8;
-    --input-bg: #e4f0ec; --error: #c03040; --ok-bg: #e0fff4; --ok-text: #108860;
+    --bg:        #FFF5F0;
+    --surface:   #fff9f6;
+    --surface-alt:#ffe8dc;
+    --surface-flash: #f0ffe0;
+    --border:    #f0a880;
+    --border-subtle: #f8c8b0;
+    --border-faint:  #fde0d0;
+    --text:      #1a0800;
+    --text-mid:  #3a1800;
+    --text-dim:  #9a5030;
+    --text-faint:#c89070;
+    --text-ghost:#e0c0b0;
+    --accent:    #E66221;
+    --accent-hi: #c04010;
+    --accent-text: #ffffff;
+    --cyan:      #0D2226;
+    --strike:    #d0a090;
+    --input-bg:  #ffe8dc;
+    --error:     #c03040;
+    --ok-bg:     #fff0e8;
+    --ok-text:   #E66221;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Courier New', monospace; background: var(--bg); color: var(--text); min-height: 100vh; transition: background .3s, color .3s; }
 
-  #header { border-bottom: 1px solid var(--border-subtle); padding: 24px 32px 18px; display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 14px; }
-  .eyebrow { font-size: 10px; letter-spacing: 4px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 4px; }
-  .title { font-size: 22px; font-weight: bold; letter-spacing: -.5px; color: var(--accent); margin-bottom: 6px; transition: color .3s; }
-  .credits { font-size: 10px; color: var(--text-dim); display: flex; gap: 20px; }
-  .credits span span { color: var(--text-mid); margin-left: 4px; }
-  #header-right { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+  body {
+    font-family: 'PT Mono', monospace;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    transition: background .3s, color .3s;
+  }
 
-  #sync-status { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; padding: 4px 10px; border: 1px solid var(--border); color: var(--text-dim); margin-right: 8px; transition: all .2s; }
+  /* ── Header ── */
+  #header {
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 0 32px;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    height: 56px;
+    gap: 16px;
+  }
+  .back-link {
+    font-size: 10px; letter-spacing: 2px; color: var(--text-dim);
+    text-decoration: none; text-transform: uppercase;
+    display: flex; align-items: center; gap: 6px; transition: color .2s;
+  }
+  .back-link:hover { color: var(--accent); }
+  .header-logo { display: flex; justify-content: center; }
+  .header-logo img { height: 22px; opacity: .9; }
+  .header-right { display: flex; gap: 6px; align-items: center; justify-content: flex-end; }
+
+  /* ── Project bar ── */
+  #project-bar {
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 14px 32px;
+    display: flex; align-items: baseline; justify-content: space-between;
+    flex-wrap: wrap; gap: 8px;
+  }
+  .project-name {
+    font-family: 'Funnel Display', sans-serif; font-weight: 800;
+    font-size: 20px; letter-spacing: -0.5px; color: var(--text);
+  }
+  .project-name .orange { color: var(--accent); }
+  .project-name .tag { font-size:13px; color:var(--text-dim); font-family:'PT Mono',monospace; font-weight:normal; letter-spacing:2px; }
+  .project-meta { font-size: 9px; letter-spacing: 3px; color: var(--text-dim); text-transform: uppercase; }
+  .project-meta b { color: var(--text-mid); font-weight: normal; }
+
+  /* ── Sync ── */
+  #sync-status {
+    font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+    padding: 4px 10px; border: 1px solid var(--border); color: var(--text-dim); transition: all .2s;
+  }
   #sync-status.syncing { color: var(--accent); border-color: var(--accent); }
-  #sync-status.ok { color: var(--ok-text); border-color: var(--ok-text); }
-  #sync-status.err { color: var(--error); border-color: var(--error); }
+  #sync-status.ok      { color: var(--ok-text); border-color: var(--ok-text); }
+  #sync-status.err     { color: var(--error); border-color: var(--error); }
 
-  .btn { font-family: 'Courier New', monospace; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; padding: 6px 14px; border: 1px solid var(--border); background: transparent; color: var(--text-dim); transition: color .2s, border-color .2s; }
+  /* ── Buttons ── */
+  .btn {
+    font-family: 'PT Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    cursor: pointer; padding: 6px 14px; border: 1px solid var(--border);
+    background: transparent; color: var(--text-dim); transition: color .2s, border-color .2s;
+  }
   .btn:hover { color: var(--accent); border-color: var(--accent); }
   .btn.active { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
   .btn.primary { background: var(--accent); color: var(--accent-text); border-color: var(--accent); font-weight: bold; }
   .btn.danger { color: var(--error); border-color: var(--error); }
-  .btn-theme { font-size: 14px; padding: 6px 10px; margin-right: 4px; }
+  .btn-theme { font-size: 14px; padding: 5px 10px; }
 
-  #main { padding: 24px 32px; max-width: 820px; margin: 0 auto; }
+  /* ── Main ── */
+  #main { padding: 28px 32px; max-width: 820px; margin: 0 auto; }
 
-  #form-box { border: 1px solid var(--border); padding: 20px 24px; margin-bottom: 28px; background: var(--surface); transition: background .5s; }
+  /* ── Nav tabs ── */
+  #nav-tabs { display: flex; margin-bottom: 24px; border-bottom: 1px solid var(--border-subtle); }
+  .tab {
+    font-family: 'PT Mono', monospace; font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    cursor: pointer; padding: 10px 20px; border: none; background: transparent; color: var(--text-dim);
+    border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color .2s, border-color .2s;
+  }
+  .tab:hover { color: var(--text-mid); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* ── Form ── */
+  #form-box {
+    border: 1px solid var(--border); padding: 20px 24px; margin-bottom: 28px;
+    background: var(--surface); transition: background .5s;
+  }
   #form-box.flash { background: var(--surface-flash); }
-  .form-title { font-size: 10px; letter-spacing: 3px; color: var(--accent); margin-bottom: 16px; text-transform: uppercase; }
+  .form-title {
+    font-family: 'Funnel Display', sans-serif; font-weight: 300;
+    font-size: 11px; letter-spacing: 4px; color: var(--accent); margin-bottom: 16px; text-transform: uppercase;
+  }
   .grid-2-eq { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .field { display: flex; flex-direction: column; }
-  label { font-size: 9px; letter-spacing: 2px; color: var(--text-dim); margin-bottom: 5px; text-transform: uppercase; }
-  input[type=date], input[type=time] { background: var(--input-bg); border: 1px solid var(--border); color: var(--text); padding: 7px 10px; font-size: 13px; font-family: 'Courier New', monospace; outline: none; width: 100%; transition: background .3s, border-color .2s; }
+  label { font-size: 8px; letter-spacing: 3px; color: var(--text-dim); margin-bottom: 5px; text-transform: uppercase; }
+  input[type=date], input[type=time] {
+    background: var(--input-bg); border: 1px solid var(--border); color: var(--text);
+    padding: 8px 10px; font-size: 13px; font-family: 'PT Mono', monospace;
+    outline: none; width: 100%; transition: background .3s, border-color .2s;
+  }
   input:focus { border-color: var(--accent); }
-  .break-section { background: var(--surface-alt); border: 1px solid var(--border-subtle); padding: 12px 14px; margin: 12px 0; }
+  .break-section {
+    background: var(--surface-alt); border: 1px solid var(--border-subtle);
+    padding: 12px 14px; margin: 12px 0;
+  }
   .break-header { display: flex; align-items: center; justify-content: space-between; }
   .break-header.has-fields { margin-bottom: 10px; }
-  .break-label { font-size: 9px; letter-spacing: 2px; color: var(--text-dim); text-transform: uppercase; }
-  .checkbox-label { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 10px; color: var(--text-dim); letter-spacing: 1px; }
+  .break-label { font-size: 8px; letter-spacing: 3px; color: var(--text-dim); text-transform: uppercase; }
+  .checkbox-label { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 9px; color: var(--text-dim); letter-spacing: 1px; }
   .checkbox-label input { accent-color: var(--accent); cursor: pointer; }
   .preview { font-size: 11px; color: var(--text-dim); margin: 10px 0 12px; display: flex; gap: 20px; flex-wrap: wrap; }
   .preview .val { color: var(--text-mid); }
@@ -64,47 +168,90 @@
   .preview .eff.bad { color: var(--error); }
   #form-error { font-size: 11px; color: var(--error); margin-bottom: 10px; min-height: 16px; }
 
-  .stats-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 20px; }
-  .stat-box { border: 1px solid var(--border); padding: 16px 20px; background: var(--surface); }
-  .stat-label { font-size: 9px; letter-spacing: 3px; color: var(--text-dim); margin-bottom: 8px; text-transform: uppercase; }
-  .stat-value { font-size: 28px; color: var(--accent); font-weight: bold; }
-  .totals-bar { border: 1px solid var(--border-subtle); padding: 12px 20px; margin-bottom: 20px; display: flex; gap: 28px; font-size: 11px; flex-wrap: wrap; }
+  /* ── Stats ── */
+  .stats-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; margin-bottom: 20px; background: var(--border); border: 1px solid var(--border); }
+  .stat-box { padding: 18px 20px; background: var(--surface); }
+  .stat-label { font-size: 8px; letter-spacing: 3px; color: var(--text-dim); margin-bottom: 8px; text-transform: uppercase; }
+  .stat-value { font-family: 'Funnel Display', sans-serif; font-weight: 800; font-size: 30px; color: var(--accent); letter-spacing: -1px; }
+  .totals-bar {
+    border: 1px solid var(--border-subtle); padding: 12px 20px; margin-bottom: 20px;
+    display: flex; gap: 28px; font-size: 11px; flex-wrap: wrap;
+  }
   .totals-bar span { color: var(--text-dim); }
   .totals-bar span b { color: var(--text-mid); font-weight: normal; }
   .totals-bar .eff b { color: var(--accent); font-weight: bold; }
 
-  .list-header { font-size: 9px; letter-spacing: 3px; color: var(--text-dim); margin-bottom: 12px; text-transform: uppercase; display: flex; justify-content: space-between; }
-  .list-total { color: var(--accent); }
-  .empty { color: var(--text-ghost); font-size: 12px; text-align: center; padding: 48px 0; border: 1px dashed var(--border-subtle); }
-  .loading-msg { color: var(--text-dim); font-size: 11px; text-align: center; padding: 40px 0; letter-spacing: 2px; }
+  /* Month rows */
+  .month-row {
+    border-bottom: 1px solid var(--border-faint); padding: 14px 0;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .month-name { font-size: 13px; color: var(--text); }
+  .month-sub { font-size: 9px; color: var(--text-faint); margin-top: 2px; letter-spacing: 1px; }
+  .month-right { display: flex; gap: 20px; align-items: center; }
+  .month-dec { font-size: 10px; color: var(--text-dim); }
+  .month-hrs { font-family: 'Funnel Display', sans-serif; font-weight: 800; font-size: 18px; color: var(--accent); min-width: 64px; text-align: right; }
+  .bar-track { width: 80px; height: 2px; background: var(--border-subtle); }
+  .bar-fill { height: 100%; background: var(--accent); }
 
-  .session-row { border-bottom: 1px solid var(--border-faint); padding: 14px 0; display: grid; grid-template-columns: 1fr auto auto auto 52px; align-items: center; gap: 16px; transition: opacity .2s; }
-  .session-row.deleting { opacity: .3; }
+  /* ── Log ── */
+  .list-header {
+    font-size: 9px; letter-spacing: 3px; color: var(--text-dim); margin-bottom: 14px;
+    text-transform: uppercase; display: flex; justify-content: space-between; align-items: center;
+  }
+  .list-total { color: var(--accent); }
+  .empty { color: var(--text-ghost); font-size: 11px; text-align: center; padding: 48px 0; border: 1px dashed var(--border-subtle); letter-spacing: 2px; }
+  .loading-msg { color: var(--text-dim); font-size: 11px; text-align: center; padding: 40px 0; letter-spacing: 3px; }
+  .session-row {
+    border-bottom: 1px solid var(--border-faint); padding: 14px 0;
+    display: grid; grid-template-columns: 1fr auto auto auto 52px;
+    align-items: center; gap: 16px; transition: opacity .2s;
+  }
+  .session-row.deleting { opacity: .25; }
   .session-date { font-size: 13px; color: var(--text); }
-  .session-time { font-size: 10px; color: var(--text-dim); margin-top: 3px; }
-  .dot { margin: 0 5px; color: var(--text-ghost); }
-  .session-break { font-size: 10px; color: var(--text-dim); text-align: center; min-width: 140px; }
+  .session-time { font-size: 9px; color: var(--text-dim); margin-top: 3px; letter-spacing: 1px; }
+  .session-break { font-size: 9px; color: var(--text-dim); text-align: center; min-width: 140px; letter-spacing: .5px; }
   .no-break { color: var(--text-ghost); }
   .brk-faint { color: var(--text-faint); }
-  .session-bruto { font-size: 11px; color: var(--strike); text-decoration: line-through; text-align: right; }
-  .session-eff { font-size: 14px; color: var(--accent); font-weight: bold; text-align: right; min-width: 52px; }
+  .session-bruto { font-size: 10px; color: var(--strike); text-decoration: line-through; text-align: right; }
+  .session-eff { font-family: 'Funnel Display', sans-serif; font-weight: 800; font-size: 16px; color: var(--accent); text-align: right; min-width: 56px; }
   .row-actions { display: flex; gap: 8px; align-items: center; justify-content: flex-end; }
   .edit-btn { background: none; border: none; color: var(--text-ghost); cursor: pointer; font-size: 13px; padding: 0; font-family: inherit; transition: color .2s; }
   .edit-btn:hover { color: var(--accent); }
   .del-btn { background: none; border: none; color: var(--text-ghost); cursor: pointer; font-size: 15px; padding: 0; font-family: inherit; transition: color .2s; }
   .del-btn.confirm { color: var(--error); }
 
-  #toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); padding: 10px 24px; font-size: 11px; letter-spacing: 2px; z-index: 100; white-space: nowrap; display: none; border: 1px solid var(--ok-text); background: var(--ok-bg); color: var(--ok-text); }
-  #toast.err { border-color: var(--error); background: #100508; color: var(--error); }
+  /* ── Export bar ── */
+  #export-bar { display: flex; gap: 6px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
+  .export-label { font-size: 9px; letter-spacing: 2px; color: var(--text-faint); text-transform: uppercase; margin-right: 4px; }
 
-  #modal-overlay, #edit-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.8); display: none; align-items: center; justify-content: center; z-index: 200; }
+  /* ── Toast ── */
+  #toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    padding: 10px 24px; font-size: 10px; letter-spacing: 3px; z-index: 100;
+    white-space: nowrap; display: none; font-family: 'PT Mono', monospace; text-transform: uppercase;
+    border: 1px solid var(--ok-text); background: var(--ok-bg); color: var(--ok-text);
+  }
+  #toast.err { border-color: var(--error); background: #0a0306; color: var(--error); }
+
+  /* ── Modals ── */
+  #modal-overlay, #edit-overlay {
+    position: fixed; inset: 0; background: rgba(7,22,24,.9);
+    display: none; align-items: center; justify-content: center; z-index: 200;
+  }
   #modal-overlay.open, #edit-overlay.open { display: flex; }
-  #modal, #edit-modal { background: var(--surface); border: 1px solid var(--border); padding: 28px 32px; max-width: 400px; width: 95%; }
+  #modal, #edit-modal {
+    background: var(--surface); border: 1px solid var(--border);
+    padding: 28px 32px; max-width: 400px; width: 95%;
+  }
   #edit-modal { border-color: var(--accent); max-width: 480px; }
-  .modal-title { font-size: 10px; letter-spacing: 3px; color: var(--accent); margin-bottom: 12px; text-transform: uppercase; }
+  .modal-title {
+    font-family: 'Funnel Display', sans-serif; font-weight: 300;
+    font-size: 11px; letter-spacing: 4px; color: var(--accent); margin-bottom: 14px; text-transform: uppercase;
+  }
   .modal-body { font-size: 13px; color: var(--text); margin-bottom: 6px; }
   .modal-body strong { color: var(--accent); }
-  .modal-hint { font-size: 11px; color: var(--text-dim); margin-bottom: 20px; }
+  .modal-hint { font-size: 10px; color: var(--text-dim); margin-bottom: 20px; line-height: 1.6; }
   .modal-btns { display: flex; gap: 8px; flex-wrap: wrap; }
   #edit-error { font-size: 11px; color: var(--error); margin-bottom: 10px; min-height: 16px; }
 </style>
@@ -112,35 +259,42 @@
 <body>
 
 <div id="header">
-  <div id="header-left">
-    <div class="eyebrow">sala de vfx · película</div>
-    <div class="title">CONTRA EL HURACÁN</div>
-    <div class="credits">
-      <span>PROYECTO <span>Sala VFX</span></span>
-    </div>
+  <a class="back-link" href="index.html">← Volver</a>
+  <div class="header-logo">
+    <img src="profiles_wordmark-21.png" alt="Post X">
   </div>
-  <div id="header-right">
+  <div class="header-right">
     <div id="sync-status">Conectando…</div>
     <button class="btn btn-theme" id="btn-theme" onclick="toggleTheme()">☀</button>
-    <button class="btn active" id="btn-log" onclick="setView('log')">Log</button>
-    <button class="btn" id="btn-resumen" onclick="setView('resumen')">Resumen</button>
-    <button class="btn" id="btn-csv" onclick="exportCSV()" style="margin-left:6px;display:none">↓ CSV</button>
-    <button class="btn" id="btn-json" onclick="exportJSON()" style="display:none">↓ JSON</button>
-    <button class="btn" onclick="document.getElementById('file-input').click()">↑ Restaurar</button>
-    <input type="file" id="file-input" accept=".json" style="display:none" onchange="handleImport(event)">
   </div>
 </div>
 
-<div id="main">
+<div id="project-bar">
+  <div class="project-name">CONTRA EL <span class="orange">HURACÁN</span> <span class="tag">· Sala VFX</span></div>
+  <div class="project-meta">Efectos Visuales</div>
+</div>
 
+<div id="main">
+  <div id="nav-tabs">
+    <button class="tab active" id="tab-log" onclick="setView('log')">Log</button>
+    <button class="tab" id="tab-resumen" onclick="setView('resumen')">Resumen</button>
+  </div>
+
+  <div id="export-bar" style="display:none">
+    <span class="export-label">Exportar:</span>
+    <button class="btn" onclick="exportCSV()">↓ CSV</button>
+    <button class="btn" onclick="exportJSON()">↓ JSON</button>
+    <button class="btn" onclick="document.getElementById('file-input').click()">↑ Restaurar</button>
+    <input type="file" id="file-input" accept=".json" style="display:none" onchange="handleImport(event)">
+  </div>
+
+  <!-- Form -->
   <div id="form-box">
     <div class="form-title">Nueva Sesión</div>
-    <div class="grid-2-eq" style="margin-bottom:12px">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px">
       <div class="field"><label>Fecha</label><input type="date" id="f-fecha"></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end">
-        <div class="field"><label>Inicio</label><input type="time" id="f-inicio" value="09:00" oninput="updatePreview()"></div>
-        <div class="field"><label>Fin</label><input type="time" id="f-fin" value="18:00" oninput="updatePreview()"></div>
-      </div>
+      <div class="field"><label>Inicio</label><input type="time" id="f-inicio" value="09:00" oninput="updatePreview()"></div>
+      <div class="field"><label>Fin</label><input type="time" id="f-fin" value="18:00" oninput="updatePreview()"></div>
     </div>
     <div class="break-section">
       <div class="break-header has-fields" id="break-header">
@@ -162,7 +316,7 @@
     <div class="stats-grid">
       <div class="stat-box"><div class="stat-label">Sesiones</div><div class="stat-value" id="s-count">—</div></div>
       <div class="stat-box"><div class="stat-label">Horas efectivas</div><div class="stat-value" id="s-hrs">—</div></div>
-      <div class="stat-box"><div class="stat-label">Promedio/día</div><div class="stat-value" id="s-avg">—</div></div>
+      <div class="stat-box"><div class="stat-label">Promedio / sesión</div><div class="stat-value" id="s-avg">—</div></div>
     </div>
     <div class="totals-bar" id="totals-bar" style="display:none">
       <span>Bruto total: <b id="t-bruto"></b></span>
@@ -179,7 +333,7 @@
       <span class="list-total" id="list-total"></span>
     </div>
     <div id="list-empty" class="empty" style="display:none">sin sesiones registradas</div>
-    <div id="list-loading" class="loading-msg">Cargando sesiones…</div>
+    <div id="list-loading" class="loading-msg">Cargando…</div>
     <div id="session-list"></div>
   </div>
 </div>
@@ -202,12 +356,10 @@
 <div id="edit-overlay">
   <div id="edit-modal">
     <div class="modal-title">Editar Sesión</div>
-    <div class="grid-2-eq" style="margin-bottom:12px">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px">
       <div class="field"><label>Fecha</label><input type="date" id="e-fecha"></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div class="field"><label>Inicio</label><input type="time" id="e-inicio" oninput="updateEditPreview()"></div>
-        <div class="field"><label>Fin</label><input type="time" id="e-fin" oninput="updateEditPreview()"></div>
-      </div>
+      <div class="field"><label>Inicio</label><input type="time" id="e-inicio" oninput="updateEditPreview()"></div>
+      <div class="field"><label>Fin</label><input type="time" id="e-fin" oninput="updateEditPreview()"></div>
     </div>
     <div class="break-section" style="margin-bottom:12px">
       <div class="break-header" id="e-break-header">
@@ -229,50 +381,29 @@
 </div>
 
 <script>
-const SUPA_URL = 'https://pyhafeehqncdhbayawor.supabase.co';
-const SUPA_KEY = 'sb_publishable_m20TjfcwiXep4KJAbbnNJg_BqJkBL0V';
-const TABLE    = 'sesiones_vfx';
-const { createClient } = supabase;
-const db = createClient(SUPA_URL, SUPA_KEY);
+const SUPA_URL='https://pyhafeehqncdhbayawor.supabase.co';
+const SUPA_KEY='sb_publishable_m20TjfcwiXep4KJAbbnNJg_BqJkBL0V';
+const TABLE='sesiones_vfx';
+const{createClient}=supabase;
+const db=createClient(SUPA_URL,SUPA_KEY);
 
-let sessions   = [];
-let currentView = 'log';
-let isDark      = true;
-let pendingImport = null;
-let deletingId  = null;
-let deleteTimer = null;
-let editingId   = null;
+let sessions=[],currentView='log',isDark=true;
+let pendingImport=null,deletingId=null,deleteTimer=null,editingId=null;
 
-// ── Utils ──────────────────────────────────────────────
-function toMins(t){ if(!t) return 0; const[h,m]=t.split(':').map(Number); return h*60+m; }
-function fmtDur(min){
-  if(min<=0) return '0m';
-  const h=Math.floor(min/60),m=min%60;
-  if(h===0) return `${m}m`; if(m===0) return `${h}h`; return `${h}h ${m}m`;
-}
-function decHrs(min){ return (min/60).toFixed(2); }
-function calcRaw(ini,fin){ return toMins(fin)-toMins(ini); }
-function calcBreak(cs,cr){ if(!cs||!cr) return 0; const d=toMins(cr)-toMins(cs); return d>0?d:0; }
-function calcEff(ini,fin,cs,cr){ return calcRaw(ini,fin)-calcBreak(cs,cr); }
-function totalMins(){ return sessions.reduce((a,s)=>a+s.duration,0); }
-function today(){ return new Date().toISOString().slice(0,10); }
-function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function toMins(t){if(!t)return 0;const[h,m]=t.split(':').map(Number);return h*60+m;}
+function fmtDur(min){if(min<=0)return'0m';const h=Math.floor(min/60),m=min%60;if(h===0)return`${m}m`;if(m===0)return`${h}h`;return`${h}h ${m}m`;}
+function decHrs(min){return(min/60).toFixed(2);}
+function calcRaw(ini,fin){return toMins(fin)-toMins(ini);}
+function calcBreak(cs,cr){if(!cs||!cr)return 0;const d=toMins(cr)-toMins(cs);return d>0?d:0;}
+function calcEff(ini,fin,cs,cr){return calcRaw(ini,fin)-calcBreak(cs,cr);}
+function totalMins(){return sessions.reduce((a,s)=>a+s.duration,0);}
+function today(){return new Date().toISOString().slice(0,10);}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
-// ── Sync ───────────────────────────────────────────────
-function setSyncStatus(state,msg){
-  const el=document.getElementById('sync-status');
-  el.className=state; el.textContent=msg;
-}
-
-// ── Toast ──────────────────────────────────────────────
+function setSyncStatus(state,msg){const el=document.getElementById('sync-status');el.className=state;el.textContent=msg;}
 let toastTimer;
-function showToast(msg,type='ok'){
-  const el=document.getElementById('toast');
-  el.textContent=msg; el.className=type==='err'?'err':''; el.style.display='block';
-  clearTimeout(toastTimer); toastTimer=setTimeout(()=>{el.style.display='none';},3500);
-}
+function showToast(msg,type='ok'){const el=document.getElementById('toast');el.textContent=msg;el.className=type==='err'?'err':'';el.style.display='block';clearTimeout(toastTimer);toastTimer=setTimeout(()=>{el.style.display='none';},3500);}
 
-// ── Theme ──────────────────────────────────────────────
 function toggleTheme(){
   isDark=!isDark;
   document.body.classList.toggle('light',!isDark);
@@ -280,18 +411,17 @@ function toggleTheme(){
   document.querySelectorAll('input').forEach(i=>i.style.colorScheme=isDark?'dark':'light');
 }
 
-// ── View ───────────────────────────────────────────────
 function setView(v){
   currentView=v;
   document.getElementById('view-log').style.display=v==='log'?'block':'none';
   document.getElementById('view-resumen').style.display=v==='resumen'?'block':'none';
   document.getElementById('form-box').style.display=v==='log'?'block':'none';
-  document.getElementById('btn-log').classList.toggle('active',v==='log');
-  document.getElementById('btn-resumen').classList.toggle('active',v==='resumen');
-  if(v==='resumen') renderResumen();
+  document.getElementById('export-bar').style.display=v==='log'&&sessions.length>0?'flex':'none';
+  document.getElementById('tab-log').classList.toggle('active',v==='log');
+  document.getElementById('tab-resumen').classList.toggle('active',v==='resumen');
+  if(v==='resumen')renderResumen();
 }
 
-// ── Break ──────────────────────────────────────────────
 function toggleBreak(){
   const sc=document.getElementById('f-sin-corte').checked;
   document.getElementById('break-fields').style.display=sc?'none':'grid';
@@ -305,187 +435,127 @@ function toggleEditBreak(){
   updateEditPreview();
 }
 
-// ── Preview ────────────────────────────────────────────
-function buildPreview(ini,fin,sinCorte,cs,cr,elId){
+function buildPreview(ini,fin,sc,cs,cr,elId){
   const el=document.getElementById(elId);
   if(!ini||!fin){el.innerHTML='';return;}
-  const raw=calcRaw(ini,fin);
-  if(raw<=0){el.innerHTML='';return;}
-  const brk=sinCorte?0:calcBreak(cs,cr);
-  const eff=raw-brk;
+  const raw=calcRaw(ini,fin);if(raw<=0){el.innerHTML='';return;}
+  const brk=sc?0:calcBreak(cs,cr),eff=raw-brk;
   let html=`<span>bruto: <span class="val">${fmtDur(raw)}</span></span>`;
-  if(brk>0) html+=`<span>comida: <span class="val">${cs} → ${cr} (−${fmtDur(brk)})</span></span>`;
+  if(brk>0)html+=`<span>comida: <span class="val">${cs} → ${cr} (−${fmtDur(brk)})</span></span>`;
   html+=`<span>efectivo: <span class="eff${eff<=0?' bad':''}">${eff>0?fmtDur(eff):'—'}</span></span>`;
   el.innerHTML=html;
 }
-function updatePreview(){
-  buildPreview(
-    document.getElementById('f-inicio').value,
-    document.getElementById('f-fin').value,
-    document.getElementById('f-sin-corte').checked,
-    document.getElementById('f-c-salida').value,
-    document.getElementById('f-c-regreso').value,
-    'preview'
-  );
-}
-function updateEditPreview(){
-  buildPreview(
-    document.getElementById('e-inicio').value,
-    document.getElementById('e-fin').value,
-    document.getElementById('e-sin-corte').checked,
-    document.getElementById('e-c-salida').value,
-    document.getElementById('e-c-regreso').value,
-    'edit-preview'
-  );
-}
+function updatePreview(){buildPreview(document.getElementById('f-inicio').value,document.getElementById('f-fin').value,document.getElementById('f-sin-corte').checked,document.getElementById('f-c-salida').value,document.getElementById('f-c-regreso').value,'preview');}
+function updateEditPreview(){buildPreview(document.getElementById('e-inicio').value,document.getElementById('e-fin').value,document.getElementById('e-sin-corte').checked,document.getElementById('e-c-salida').value,document.getElementById('e-c-regreso').value,'edit-preview');}
 
-// ── Load ───────────────────────────────────────────────
 async function loadSessions(){
   setSyncStatus('syncing','Sincronizando…');
-  const {data,error}=await db.from(TABLE).select('*').order('id',{ascending:false});
-  if(error){
-    setSyncStatus('err','Sin conexión');
-    showToast('Error al cargar datos','err');
-    document.getElementById('list-loading').style.display='none';
-    document.getElementById('list-empty').style.display='block';
-    return;
-  }
+  const{data,error}=await db.from(TABLE).select('*').order('id',{ascending:false});
+  if(error){setSyncStatus('err','Sin conexión');showToast('Error al cargar','err');document.getElementById('list-loading').style.display='none';document.getElementById('list-empty').style.display='block';return;}
   sessions=data.map(r=>({id:r.id,fecha:r.fecha,inicio:r.inicio,fin:r.fin,cSalida:r.c_salida||'',cRegreso:r.c_regreso||'',duration:r.duration}));
-  setSyncStatus('ok','En línea'); setTimeout(()=>setSyncStatus('',''),2500);
-  updateHeaderBtns(); renderLog();
-  if(currentView==='resumen') renderResumen();
+  setSyncStatus('ok','En línea');setTimeout(()=>setSyncStatus('',''),2500);
+  updateExportBar();renderLog();
+  if(currentView==='resumen')renderResumen();
   document.getElementById('list-loading').style.display='none';
 }
 
-// ── Add ────────────────────────────────────────────────
 async function addSession(){
-  const errEl=document.getElementById('form-error'); errEl.textContent='';
+  const errEl=document.getElementById('form-error');errEl.textContent='';
   const fecha=document.getElementById('f-fecha').value;
-  const ini=document.getElementById('f-inicio').value;
-  const fin=document.getElementById('f-fin').value;
-  const sinCorte=document.getElementById('f-sin-corte').checked;
-  const cs=sinCorte?'':document.getElementById('f-c-salida').value;
-  const cr=sinCorte?'':document.getElementById('f-c-regreso').value;
-
+  const ini=document.getElementById('f-inicio').value,fin=document.getElementById('f-fin').value;
+  const sc=document.getElementById('f-sin-corte').checked;
+  const cs=sc?'':document.getElementById('f-c-salida').value;
+  const cr=sc?'':document.getElementById('f-c-regreso').value;
   if(!fecha){errEl.textContent='⚠ Ingresa la fecha.';return;}
   if(calcRaw(ini,fin)<=0){errEl.textContent='⚠ La hora de fin debe ser mayor que la de inicio.';return;}
-  if(!sinCorte&&calcBreak(cs,cr)<=0){errEl.textContent='⚠ La hora de regreso debe ser mayor que la de salida.';return;}
+  if(!sc&&calcBreak(cs,cr)<=0){errEl.textContent='⚠ La hora de regreso debe ser mayor que la de salida.';return;}
   const duration=calcEff(ini,fin,cs,cr);
-  if(duration<=0){errEl.textContent='⚠ El corte de comida es mayor que la sesión.';return;}
-
+  if(duration<=0){errEl.textContent='⚠ El corte es mayor que la sesión.';return;}
   const id=Date.now();
   setSyncStatus('syncing','Guardando…');
-  const {error}=await db.from(TABLE).insert([{id,fecha,inicio:ini,fin,c_salida:cs||null,c_regreso:cr||null,duration}]);
-  if(error){setSyncStatus('err','Error al guardar');showToast('No se pudo guardar','err');return;}
-  setSyncStatus('ok','Guardado ✓'); setTimeout(()=>setSyncStatus('',''),2000);
-
+  const{error}=await db.from(TABLE).insert([{id,fecha,inicio:ini,fin,c_salida:cs||null,c_regreso:cr||null,duration}]);
+  if(error){setSyncStatus('err','Error');showToast('No se pudo guardar','err');return;}
+  setSyncStatus('ok','Guardado ✓');setTimeout(()=>setSyncStatus('',''),2000);
   sessions.unshift({id,fecha,inicio:ini,fin,cSalida:cs,cRegreso:cr,duration});
-  const box=document.getElementById('form-box');
-  box.classList.add('flash'); setTimeout(()=>box.classList.remove('flash'),700);
-  document.getElementById('f-inicio').value='09:00';
-  document.getElementById('f-fin').value='18:00';
-  document.getElementById('f-c-salida').value='14:00';
-  document.getElementById('f-c-regreso').value='15:00';
+  const box=document.getElementById('form-box');box.classList.add('flash');setTimeout(()=>box.classList.remove('flash'),700);
+  document.getElementById('f-inicio').value='09:00';document.getElementById('f-fin').value='18:00';
+  document.getElementById('f-c-salida').value='14:00';document.getElementById('f-c-regreso').value='15:00';
   document.getElementById('f-sin-corte').checked=false;
   document.getElementById('break-fields').style.display='grid';
   document.getElementById('break-header').classList.add('has-fields');
-  updatePreview(); updateHeaderBtns(); renderLog();
+  updatePreview();updateExportBar();renderLog();
 }
 
-// ── Delete ─────────────────────────────────────────────
 async function deleteSession(id){
   if(deletingId===id){
     setSyncStatus('syncing','Borrando…');
-    const {error}=await db.from(TABLE).delete().eq('id',id);
+    const{error}=await db.from(TABLE).delete().eq('id',id);
     if(error){setSyncStatus('err','Error');showToast('No se pudo borrar','err');return;}
-    sessions=sessions.filter(s=>s.id!==id);
-    deletingId=null; clearTimeout(deleteTimer);
-    setSyncStatus('ok','Borrado ✓'); setTimeout(()=>setSyncStatus('',''),2000);
-    updateHeaderBtns(); renderLog();
-    if(currentView==='resumen') renderResumen();
-  } else {
-    if(deletingId!==null){
-      const old=document.querySelector(`.del-btn[data-id="${deletingId}"]`);
-      if(old){old.textContent='·';old.classList.remove('confirm');}
-    }
+    sessions=sessions.filter(s=>s.id!==id);deletingId=null;clearTimeout(deleteTimer);
+    setSyncStatus('ok','Borrado ✓');setTimeout(()=>setSyncStatus('',''),2000);
+    updateExportBar();renderLog();if(currentView==='resumen')renderResumen();
+  }else{
+    if(deletingId!==null){const old=document.querySelector(`.del-btn[data-id="${deletingId}"]`);if(old){old.textContent='·';old.classList.remove('confirm');}}
     deletingId=id;
     const btn=document.querySelector(`.del-btn[data-id="${id}"]`);
     if(btn){btn.textContent='✕';btn.classList.add('confirm');}
     clearTimeout(deleteTimer);
-    deleteTimer=setTimeout(()=>{
-      deletingId=null;
-      const b=document.querySelector(`.del-btn[data-id="${id}"]`);
-      if(b){b.textContent='·';b.classList.remove('confirm');}
-    },3000);
+    deleteTimer=setTimeout(()=>{deletingId=null;const b=document.querySelector(`.del-btn[data-id="${id}"]`);if(b){b.textContent='·';b.classList.remove('confirm');}},3000);
   }
 }
 
-// ── Edit ───────────────────────────────────────────────
 function openEdit(id){
-  const s=sessions.find(s=>s.id===id); if(!s) return;
+  const s=sessions.find(s=>s.id===id);if(!s)return;
   editingId=id;
   document.getElementById('e-fecha').value=s.fecha;
   document.getElementById('e-inicio').value=s.inicio;
   document.getElementById('e-fin').value=s.fin;
-  const sinCorte=!s.cSalida&&!s.cRegreso;
-  document.getElementById('e-sin-corte').checked=sinCorte;
+  const sc=!s.cSalida&&!s.cRegreso;
+  document.getElementById('e-sin-corte').checked=sc;
   document.getElementById('e-c-salida').value=s.cSalida||'14:00';
   document.getElementById('e-c-regreso').value=s.cRegreso||'15:00';
-  document.getElementById('e-break-fields').style.display=sinCorte?'none':'grid';
-  document.getElementById('e-break-header').classList.toggle('has-fields',!sinCorte);
+  document.getElementById('e-break-fields').style.display=sc?'none':'grid';
+  document.getElementById('e-break-header').classList.toggle('has-fields',!sc);
   document.getElementById('edit-error').textContent='';
   updateEditPreview();
   document.getElementById('edit-overlay').classList.add('open');
   document.querySelectorAll('#edit-modal input').forEach(i=>i.style.colorScheme=isDark?'dark':'light');
 }
-function closeEditModal(){ document.getElementById('edit-overlay').classList.remove('open'); editingId=null; }
+function closeEditModal(){document.getElementById('edit-overlay').classList.remove('open');editingId=null;}
 
 async function saveEdit(){
-  const errEl=document.getElementById('edit-error'); errEl.textContent='';
+  const errEl=document.getElementById('edit-error');errEl.textContent='';
   const fecha=document.getElementById('e-fecha').value;
-  const ini=document.getElementById('e-inicio').value;
-  const fin=document.getElementById('e-fin').value;
-  const sinCorte=document.getElementById('e-sin-corte').checked;
-  const cs=sinCorte?'':document.getElementById('e-c-salida').value;
-  const cr=sinCorte?'':document.getElementById('e-c-regreso').value;
-
+  const ini=document.getElementById('e-inicio').value,fin=document.getElementById('e-fin').value;
+  const sc=document.getElementById('e-sin-corte').checked;
+  const cs=sc?'':document.getElementById('e-c-salida').value;
+  const cr=sc?'':document.getElementById('e-c-regreso').value;
   if(!fecha){errEl.textContent='⚠ Ingresa la fecha.';return;}
   if(calcRaw(ini,fin)<=0){errEl.textContent='⚠ La hora de fin debe ser mayor que la de inicio.';return;}
-  if(!sinCorte&&calcBreak(cs,cr)<=0){errEl.textContent='⚠ La hora de regreso debe ser mayor que la de salida.';return;}
+  if(!sc&&calcBreak(cs,cr)<=0){errEl.textContent='⚠ La hora de regreso debe ser mayor que la de salida.';return;}
   const duration=calcEff(ini,fin,cs,cr);
-  if(duration<=0){errEl.textContent='⚠ El corte de comida es mayor que la sesión.';return;}
-
+  if(duration<=0){errEl.textContent='⚠ El corte es mayor que la sesión.';return;}
   setSyncStatus('syncing','Guardando…');
-  const {error}=await db.from(TABLE).update({fecha,inicio:ini,fin,c_salida:cs||null,c_regreso:cr||null,duration}).eq('id',editingId);
+  const{error}=await db.from(TABLE).update({fecha,inicio:ini,fin,c_salida:cs||null,c_regreso:cr||null,duration}).eq('id',editingId);
   if(error){setSyncStatus('err','Error');showToast('No se pudo guardar','err');return;}
-
   const idx=sessions.findIndex(s=>s.id===editingId);
-  if(idx!==-1) sessions[idx]={...sessions[idx],fecha,inicio:ini,fin,cSalida:cs,cRegreso:cr,duration};
-  setSyncStatus('ok','Guardado ✓'); setTimeout(()=>setSyncStatus('',''),2000);
-  showToast('Sesión actualizada ✓');
-  closeEditModal(); renderLog();
-  if(currentView==='resumen') renderResumen();
+  if(idx!==-1)sessions[idx]={...sessions[idx],fecha,inicio:ini,fin,cSalida:cs,cRegreso:cr,duration};
+  setSyncStatus('ok','Guardado ✓');setTimeout(()=>setSyncStatus('',''),2000);
+  showToast('Sesión actualizada ✓');closeEditModal();renderLog();if(currentView==='resumen')renderResumen();
 }
 
-// ── Render log ─────────────────────────────────────────
 function renderLog(){
   const total=totalMins();
   document.getElementById('list-count').textContent=`Sesiones · ${sessions.length}`;
   document.getElementById('list-total').textContent=sessions.length?`${fmtDur(total)} efectivas`:'';
-  const empty=document.getElementById('list-empty');
-  const list=document.getElementById('session-list');
+  const empty=document.getElementById('list-empty'),list=document.getElementById('session-list');
   if(sessions.length===0){empty.style.display='block';list.innerHTML='';return;}
   empty.style.display='none';
   list.innerHTML=sessions.map(s=>{
     const brk=calcBreak(s.cSalida,s.cRegreso);
-    const brkHtml=brk>0
-      ?`${s.cSalida} → ${s.cRegreso} <span class="brk-faint">(−${fmtDur(brk)})</span>`
-      :`<span class="no-break">sin corte</span>`;
-    return `<div class="session-row" id="row-${s.id}">
-      <div>
-        <div class="session-date">${s.fecha}</div>
-        <div class="session-time">${s.inicio} → ${s.fin}</div>
-      </div>
+    const brkHtml=brk>0?`${s.cSalida} → ${s.cRegreso} <span class="brk-faint">(−${fmtDur(brk)})</span>`:`<span class="no-break">sin corte</span>`;
+    return`<div class="session-row" id="row-${s.id}">
+      <div><div class="session-date">${s.fecha}</div><div class="session-time">${s.inicio} → ${s.fin}</div></div>
       <div class="session-break">${brkHtml}</div>
       <div class="session-bruto">${fmtDur(calcRaw(s.inicio,s.fin))}</div>
       <div class="session-eff">${fmtDur(s.duration)}</div>
@@ -497,98 +567,66 @@ function renderLog(){
   }).join('');
 }
 
-// ── Render resumen ─────────────────────────────────────
 function renderResumen(){
   const total=totalMins();
   const avg=sessions.length?Math.round(total/sessions.length):0;
   document.getElementById('s-count').textContent=sessions.length;
   document.getElementById('s-hrs').textContent=sessions.length?fmtDur(total):'—';
   document.getElementById('s-avg').textContent=sessions.length?fmtDur(avg):'—';
-
   const bar=document.getElementById('totals-bar');
   if(sessions.length>0){
     bar.style.display='flex';
-    const totalBruto=sessions.reduce((a,s)=>a+calcRaw(s.inicio,s.fin),0);
-    const totalCorte=sessions.reduce((a,s)=>a+calcBreak(s.cSalida,s.cRegreso),0);
-    document.getElementById('t-bruto').textContent=fmtDur(totalBruto);
-    document.getElementById('t-corte').textContent=`−${fmtDur(totalCorte)}`;
+    const tb=sessions.reduce((a,s)=>a+calcRaw(s.inicio,s.fin),0);
+    const tc=sessions.reduce((a,s)=>a+calcBreak(s.cSalida,s.cRegreso),0);
+    document.getElementById('t-bruto').textContent=fmtDur(tb);
+    document.getElementById('t-corte').textContent=`−${fmtDur(tc)}`;
     document.getElementById('t-eff').textContent=fmtDur(total);
-  } else { bar.style.display='none'; }
-
-  // Sessions by week
+  }else{bar.style.display='none';}
   const rl=document.getElementById('resumen-list');
-  if(!sessions.length){rl.innerHTML='<div style="color:var(--text-faint);font-size:12px;text-align:center;padding:40px 0">sin sesiones registradas</div>';return;}
-
-  // Group by month
+  if(!sessions.length){rl.innerHTML='<div style="color:var(--text-faint);font-size:11px;text-align:center;padding:40px 0;letter-spacing:2px">sin sesiones registradas</div>';return;}
   const byMonth={};
-  sessions.forEach(s=>{
-    const mo=s.fecha.slice(0,7);
-    if(!byMonth[mo]) byMonth[mo]={mins:0,count:0};
-    byMonth[mo].mins+=s.duration; byMonth[mo].count++;
-  });
+  sessions.forEach(s=>{const mo=s.fecha.slice(0,7);if(!byMonth[mo]){byMonth[mo]={mins:0,count:0};}byMonth[mo].mins+=s.duration;byMonth[mo].count++;});
   const monthNames=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   rl.innerHTML=Object.entries(byMonth).sort((a,b)=>b[0].localeCompare(a[0])).map(([mo,d])=>{
-    const [y,m]=mo.split('-');
+    const[y,m]=mo.split('-');
     const name=`${monthNames[parseInt(m)-1]} ${y}`;
     const pct=total>0?(d.mins/total*100):0;
-    return `<div style="border-bottom:1px solid var(--border-faint);padding:14px 0;display:flex;justify-content:space-between;align-items:center">
-      <div>
-        <div style="font-size:13px;color:var(--text)">${name}</div>
-        <div style="font-size:10px;color:var(--text-faint);margin-top:2px">${d.count} sesión${d.count!==1?'es':''} · prom ${fmtDur(Math.round(d.mins/d.count))}/día</div>
-      </div>
-      <div style="display:flex;gap:20px;align-items:center">
-        <span style="font-size:11px;color:var(--text-dim)">${decHrs(d.mins)}h</span>
-        <span style="font-size:15px;color:var(--accent);min-width:64px;text-align:right">${fmtDur(d.mins)}</span>
-        <div style="width:90px;height:3px;background:var(--border-subtle)">
-          <div style="width:${pct}%;height:100%;background:var(--accent)"></div>
-        </div>
+    return`<div class="month-row">
+      <div><div class="month-name">${name}</div><div class="month-sub">${d.count} sesión${d.count!==1?'es':''} · prom ${fmtDur(Math.round(d.mins/d.count))}/sesión</div></div>
+      <div class="month-right">
+        <span class="month-dec">${decHrs(d.mins)}h</span>
+        <span class="month-hrs">${fmtDur(d.mins)}</span>
+        <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
       </div>
     </div>`;
   }).join('');
 }
 
-// ── Header buttons ─────────────────────────────────────
-function updateHeaderBtns(){
-  const has=sessions.length>0;
-  document.getElementById('btn-csv').style.display=has?'':'none';
-  document.getElementById('btn-json').style.display=has?'':'none';
+function updateExportBar(){
+  document.getElementById('export-bar').style.display=sessions.length>0&&currentView==='log'?'flex':'none';
 }
 
-// ── Export CSV ─────────────────────────────────────────
 function exportCSV(){
   const header=['#','Proyecto','Fecha','Inicio','Fin','Salida comida','Regreso comida','Corte (min)','Bruto','Efectivo','Horas decimales'];
-  const rows=[...sessions].reverse().map((s,i)=>[
-    i+1,'Contra el Huracán - VFX',s.fecha,s.inicio,s.fin,
-    s.cSalida||'—',s.cRegreso||'—',calcBreak(s.cSalida,s.cRegreso),
-    fmtDur(calcRaw(s.inicio,s.fin)),fmtDur(s.duration),decHrs(s.duration)
-  ]);
+  const rows=[...sessions].reverse().map((s,i)=>[i+1,'Contra el Huracán - VFX',s.fecha,s.inicio,s.fin,s.cSalida||'—',s.cRegreso||'—',calcBreak(s.cSalida,s.cRegreso),fmtDur(calcRaw(s.inicio,s.fin)),fmtDur(s.duration),decHrs(s.duration)]);
   dl([header,...rows].map(r=>r.join(',')).join('\n'),'sala_vfx_contra_el_huracan.csv','text/csv;charset=utf-8;');
 }
-
-// ── Export JSON ────────────────────────────────────────
 function exportJSON(){
   const backup={meta:{proyecto:'Contra el Huracán',sala:'VFX',exportado:new Date().toISOString(),total_sesiones:sessions.length,total_horas_efectivas:decHrs(totalMins())},sesiones:[...sessions].reverse()};
-  dl(JSON.stringify(backup,null,2),`backup_sala_vfx_${new Date().toISOString().slice(0,10)}.json`,'application/json');
+  dl(JSON.stringify(backup,null,2),`backup_vfx_${new Date().toISOString().slice(0,10)}.json`,'application/json');
   showToast('Backup JSON descargado ✓');
 }
+function dl(content,filename,type){const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob([content],{type})),download:filename});a.click();URL.revokeObjectURL(a.href);}
 
-function dl(content,filename,type){
-  const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob([content],{type})),download:filename});
-  a.click(); URL.revokeObjectURL(a.href);
-}
-
-// ── Import ─────────────────────────────────────────────
 function handleImport(e){
-  const file=e.target.files?.[0]; if(!file) return; e.target.value='';
+  const file=e.target.files?.[0];if(!file)return;e.target.value='';
   const reader=new FileReader();
   reader.onload=ev=>{
     try{
       const parsed=JSON.parse(ev.target.result);
       const sesiones=Array.isArray(parsed)?parsed:parsed.sesiones;
-      if(!Array.isArray(sesiones)) throw new Error('Formato inválido');
-      for(const s of sesiones)
-        if(!s.id||!s.fecha||!s.inicio||!s.fin||s.duration===undefined)
-          throw new Error('Campos faltantes');
+      if(!Array.isArray(sesiones))throw new Error('Formato inválido');
+      for(const s of sesiones)if(!s.id||!s.fecha||!s.inicio||!s.fin||s.duration===undefined)throw new Error('Campos faltantes');
       pendingImport=[...sesiones].sort((a,b)=>b.id-a.id);
       document.getElementById('modal-count').textContent=pendingImport.length;
       document.getElementById('modal-overlay').classList.add('open');
@@ -596,32 +634,17 @@ function handleImport(e){
   };
   reader.readAsText(file);
 }
-
 async function confirmImport(replace){
-  closeModal();
-  setSyncStatus('syncing','Importando…');
-  if(replace){
-    await db.from(TABLE).delete().neq('id',0);
-    const rows=pendingImport.map(s=>({id:s.id,fecha:s.fecha,inicio:s.inicio,fin:s.fin,c_salida:s.cSalida||null,c_regreso:s.cRegreso||null,duration:s.duration}));
-    await db.from(TABLE).insert(rows);
-  } else {
-    const ids=new Set(sessions.map(s=>s.id));
-    const newOnes=pendingImport.filter(s=>!ids.has(s.id));
-    if(newOnes.length>0){
-      const rows=newOnes.map(s=>({id:s.id,fecha:s.fecha,inicio:s.inicio,fin:s.fin,c_salida:s.cSalida||null,c_regreso:s.cRegreso||null,duration:s.duration}));
-      await db.from(TABLE).insert(rows);
-    }
-  }
+  closeModal();setSyncStatus('syncing','Importando…');
+  if(replace){await db.from(TABLE).delete().neq('id',0);const rows=pendingImport.map(s=>({id:s.id,fecha:s.fecha,inicio:s.inicio,fin:s.fin,c_salida:s.cSalida||null,c_regreso:s.cRegreso||null,duration:s.duration}));await db.from(TABLE).insert(rows);}
+  else{const ids=new Set(sessions.map(s=>s.id));const newOnes=pendingImport.filter(s=>!ids.has(s.id));if(newOnes.length>0){const rows=newOnes.map(s=>({id:s.id,fecha:s.fecha,inicio:s.inicio,fin:s.fin,c_salida:s.cSalida||null,c_regreso:s.cRegreso||null,duration:s.duration}));await db.from(TABLE).insert(rows);}}
   showToast(`Backup restaurado · ${pendingImport.length} sesiones`);
-  pendingImport=null;
-  await loadSessions();
+  pendingImport=null;await loadSessions();
 }
-
-function closeModal(){ document.getElementById('modal-overlay').classList.remove('open'); }
+function closeModal(){document.getElementById('modal-overlay').classList.remove('open');}
 document.getElementById('modal-overlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
 document.getElementById('edit-overlay').addEventListener('click',function(e){if(e.target===this)closeEditModal();});
 
-// ── Init ───────────────────────────────────────────────
 document.getElementById('f-fecha').value=today();
 document.querySelectorAll('input').forEach(i=>i.style.colorScheme='dark');
 updatePreview();
